@@ -6,12 +6,12 @@
 </head>
 <body>
 <div class="py-16">
-    <div class="flex bg-white rounded-lg shadow-lg overflow-hidden mx-auto max-w-[426px] lg:max-w-4xl">
+    <div class="flex bg-white rounded-lg shadow-lg overflow-hidden mx-auto mt-0 md:mt-8 max-w-[426px] lg:max-w-4xl">
         <div class="hidden lg:block lg:w-1/2 bg-cover"
              style="background-image:url('https://images.unsplash.com/photo-1546514714-df0ccc50d7bf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=667&q=80')">
         </div>
         <div class="w-full px-10 pt-6 pb-12 lg:w-1/2">
-            <h2 class="text-2xl font-semibold text-gray-700 text-center">Brand</h2>
+            <h2 class="text-2xl font-semibold text-gray-700 text-center">E-Market</h2>
             <p class="text-xl text-gray-600 text-center">Welcome back!</p>
             <a href="#" class="flex items-center justify-center mt-4 text-white rounded-lg shadow-md hover:bg-gray-100">
                 <div class="px-4 py-3">
@@ -37,31 +37,58 @@
                 <a href="#" class="text-xs text-center text-gray-500 uppercase">or login with email</a>
                 <span class="border-b w-1/5 lg:w-1/4"></span>
             </div>
-            <form method="POST">
+            <form action="{{ route('login') }}" method="POST">
+                @csrf
+
                 <div class="mt-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                    <input class="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
-                           type="email"
-                           placeholder="Email"
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Phone Number</label>
+                    <input class="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none
+                            @error('phone')
+                                    ring-1 ring-red-500
+                            @enderror"
+                           value="{{ old('phone') }}"
+                           type="text"
+                           name="phone"
+                           placeholder="Phone Number"
                     />
+                    @error('phone')
+                    <span class="text-red-500 text-xs">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="mt-4">
                     <div class="flex justify-between">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
                         <a href="#" class="text-xs text-gray-500">Forget Password?</a>
                     </div>
-                    <input class="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
+                    <input class="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none
+                            @error('phone')
+                                    ring-1 ring-red-500
+                            @enderror"
                            type="password"
+                           name="password"
                            placeholder="Password"
                     />
+                    @error('password')
+                    <span class="text-red-500 text-xs">{{ $message }}</span>
+                    @enderror
                 </div>
-                <div class="mt-8">
+
+                <div class="mt-3">
+                    <input type="checkbox" name="remember" id="remember">
+                    <label class="cursor-pointer" for="remember">Remember me</label>
+                </div>
+
+                @error('failed')
+                <span class="mt-6 text-red-500 text-xs">{{ $message }}</span>
+                @enderror
+
+                <div class="mt-6">
                     <button class="bg-gray-700 cursor-pointer text-white font-bold py-2 px-4 w-full rounded hover:bg-gray-600">Login</button>
                 </div>
             </form>
             <div class="mt-4 flex items-center justify-between">
                 <span class="border-b w-1/5 md:w-1/4"></span>
-                <a href="#" class="text-xs text-gray-500 uppercase">or sign up</a>
+                <a href="{{ route('register') }}" class="text-xs text-gray-500 uppercase">or sign up</a>
                 <span class="border-b w-1/5 md:w-1/4"></span>
             </div>
         </div>
