@@ -183,19 +183,91 @@
             <div class="my-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
 
                 @foreach($products as $product)
-                    <div class="flex flex-col shadow-lg p-2 h-full">
-                        <div class="w-full aspect-square rounded-sm overflow-hidden mb-2">  <!-- or aspect-[4/3] -->
-                            <img class="w-full h-full object-cover"
-                                 src="{{ $product->images->first()->image_url }}"
-                                 alt="{{ $product->title }}" />
+                    <div class="flex flex-col shadow-lg p-2 h-full relative"
+                         x-data="{
+             currentSlide: 0,
+             totalSlides: {{ $product->images->count() }},
+             autoSlideInterval: null,
+             init() {
+                 if (this.totalSlides > 1) {
+                     this.startAutoSlide();
+                     this.$watch('currentSlide', (value) => {
+                         if (value >= this.totalSlides) this.currentSlide = 0;
+                         if (value < 0) this.currentSlide = this.totalSlides - 1;
+                     });
+                 }
+             },
+             startAutoSlide() {
+                 this.autoSlideInterval = setInterval(() => {
+                     this.nextSlide();
+                 }, 5000);
+             },
+             stopAutoSlide() {
+                 clearInterval(this.autoSlideInterval);
+             },
+             nextSlide() {
+                 this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+             },
+             prevSlide() {
+                 this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
+             }
+         }">
+
+                        <div class="w-full aspect-square rounded-sm overflow-hidden mb-2 relative"
+                             @mouseenter="stopAutoSlide()"
+                             @mouseleave="startAutoSlide()">
+
+                            <div class="relative h-full w-full overflow-hidden">
+                                @foreach($product->images as $index => $image)
+                                    <div x-show="currentSlide === {{ $index }}"
+                                         x-transition:enter="transition ease-out duration-500"
+                                         x-transition:enter-start="opacity-0"
+                                         x-transition:enter-end="opacity-100"
+                                         x-transition:leave="transition ease-in duration-500"
+                                         x-transition:leave-start="opacity-100"
+                                         x-transition:leave-end="opacity-0"
+                                         class="absolute inset-0">
+                                        <img class="w-full h-full object-cover"
+                                             src="{{ $image->image_url }}"
+                                             alt="{{ $product->title }} - Image {{ $index + 1 }}"
+                                             loading="lazy">
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            @if($product->images->count() > 1)
+                                <button x-show="currentSlide > 0"
+                                        @click="prevSlide(); stopAutoSlide(); setTimeout(startAutoSlide, 5000);"
+                                        class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white text-gray-800 rounded-full p-2 transition-all">
+                                    <i class='bx bx-chevron-left text-xl'></i>
+                                </button>
+
+                                <button x-show="currentSlide < totalSlides - 1"
+                                        @click="nextSlide(); stopAutoSlide(); setTimeout(startAutoSlide, 5000);"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white text-gray-800 rounded-full p-2 transition-all">
+                                    <i class='bx bx-chevron-right text-xl'></i>
+                                </button>
+                            @endif
+
+                            @if($product->images->count() > 1)
+                                <div class="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+                                    @foreach($product->images as $index => $image)
+                                        <button @click="currentSlide = {{ $index }}; stopAutoSlide(); setTimeout(startAutoSlide, 5000);"
+                                                class="w-2 h-2 rounded-full transition-all"
+                                                :class="currentSlide === {{ $index }} ? 'bg-white w-4' : 'bg-white/50'">
+                                        </button>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
-                        <div class="flex flex-col flex-grow">
-                            <p class="my-2 line-clamp-2">{{ $product->title }}</p>
-                            <div class="flex justify-between items-end mt-auto">
-                                <span>${{ number_format($product->price, 2) }}</span>
-                                <span class="text-xl py-1 cursor-pointer rounded-sm px-2 bg-slate-600 text-white">
+
+                        <div class="flex flex-col flex-grow px-1 pb-1">
+                            <p class="my-1 line-clamp-2 font-medium">{{ $product->title }}</p>
+                            <div class="flex justify-between items-end mt-auto pt-2">
+                                <span class="font-semibold">${{ number_format($product->price, 2) }}</span>
+                                <button class="text-xl py-1 cursor-pointer rounded-sm px-2 bg-slate-600 text-white hover:bg-slate-700 transition">
                                     <i class='bx bx-cart-plus'></i>
-                                </span>
+                                </button>
                             </div>
                         </div>
                     </div>

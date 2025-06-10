@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/profile', 'profile.index')->name('profile');
+//Route::view('/profile', 'profile.index')->name('profile');
 
 Route::get("/", [ProductController::class, "index"])->name("home");
+Route::get("/profile", [UserController::class, "getProfile"])->name("profile");
 
 Route::view('/login', 'auth.login')->name('login');
 Route::view('/register', 'auth.register')->name('register');

@@ -141,59 +141,142 @@
                 </div>
             </div>
 
-            <div class="my-6 px-4 sm:px-16 md:px-20 lg:px-28 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            @if($products->isNotEmpty())
+                <div class="my-6 px-4 sm:px-16 md:px-20 lg:px-28 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
 
-                @foreach([1,2,3,4,5] as $test)
+                    @foreach($products as $product)
+                        <div class="flex flex-col shadow-lg p-2 h-full relative"
+                             x-data="{
+             open: false,
+             currentSlide: 0,
+             totalSlides: {{ $product->images->count() }},
+             autoSlideInterval: null,
+             init() {
+                 if (this.totalSlides > 1) {
+                     this.startAutoSlide();
+                     this.$watch('currentSlide', (value) => {
+                         if (value >= this.totalSlides) this.currentSlide = 0;
+                         if (value < 0) this.currentSlide = this.totalSlides - 1;
+                     });
+                 }
+             },
+             startAutoSlide() {
+                 this.autoSlideInterval = setInterval(() => {
+                     this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+                 }, 5000);
+             },
+             stopAutoSlide() {
+                 clearInterval(this.autoSlideInterval);
+             },
+             nextSlide() {
+                 this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+                 this.stopAutoSlide();
+                 setTimeout(() => this.startAutoSlide(), 5000);
+             },
+             prevSlide() {
+                 this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
+                 this.stopAutoSlide();
+                 setTimeout(() => this.startAutoSlide(), 5000);
+             }
+         }">
 
-                    <div class="flex flex-col shadow-lg p-2 h-full relative" x-data="{ open: false }">
-                        <div class="w-full aspect-square rounded-sm overflow-hidden mb-2 relative">
-                            <img class="w-full h-full object-cover"
-                                 src="https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg"
-                                 alt="Nike shoe" />
+                            <div class="w-full aspect-square rounded-sm overflow-hidden mb-2 relative"
+                                 @mouseenter="stopAutoSlide()"
+                                 @mouseleave="startAutoSlide()">
 
-                            <div class="absolute top-0 right-2">
-                                <span class="text-2xl py-1 cursor-pointer rounded-full w-8 h-8 flex items-center justify-center text-gray-100/90  transition-all"
-                                      @click="open = !open"
-                                      @click.outside="open = false">
-                                    <i class='bx bx-dots-horizontal-rounded'></i>
-                                </span>
+                                <div class="relative h-full w-full overflow-hidden">
+                                    @foreach($product->images as $index => $image)
+                                        <div x-show="currentSlide === {{ $index }}"
+                                             x-transition:enter="transition ease-out duration-300"
+                                             x-transition:enter-start="opacity-0"
+                                             x-transition:enter-end="opacity-100"
+                                             x-transition:leave="transition ease-in duration-300"
+                                             x-transition:leave-start="opacity-100"
+                                             x-transition:leave-end="opacity-0"
+                                             class="absolute inset-0">
+                                            <img class="w-full h-full object-cover"
+                                                 src="{{ $image->image_url }}"
+                                                 alt="{{ $product->title }} - Image {{ $index + 1 }}"
+                                                 loading="lazy">
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                @if($product->images->count() > 1)
+                                    <button x-show="currentSlide > 0"
+                                            @click="prevSlide()"
+                                            class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/50 rounded-full p-2 text-gray-800 hover:bg-white transition">
+                                        <i class='bx bx-chevron-left text-xl'></i>
+                                    </button>
+
+                                    <button x-show="currentSlide < {{ $product->images->count() - 1 }}"
+                                            @click="nextSlide()"
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/50 rounded-full p-2 text-gray-800 hover:bg-white transition">
+                                        <i class='bx bx-chevron-right text-xl'></i>
+                                    </button>
+                                @endif
+
+                                @if($product->images->count() > 1)
+                                    <div class="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+                                        @foreach($product->images as $index => $image)
+                                            <button @click="currentSlide = {{ $index }}; stopAutoSlide(); setTimeout(() => startAutoSlide(), 5000);"
+                                                    class="w-2 h-2 rounded-full transition-all"
+                                                    :class="currentSlide === {{ $index }} ? 'bg-white w-4' : 'bg-white/50'">
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <div class="absolute top-2 right-2">
+                <span class="text-2xl py-1 cursor-pointer rounded-full w-8 h-8 flex items-center justify-center bg-white/80 text-gray-800 hover:bg-white transition-all"
+                      @click="open = !open"
+                      @click.outside="open = false">
+                    <i class='bx bx-dots-horizontal-rounded'></i>
+                </span>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col flex-grow px-2 pb-1.5">
+                                <p class="my-1 line-clamp-2">{{ $product->title }}</p>
+                                <p class="text-sm text-gray-500">
+                                    {{ $product->created_at->diffForHumans() }} by
+                                    <span class="text-cyan-500">{{ $product->seller->first_name }}</span>
+                                </p>
+                                <div class="flex justify-between items-end mt-4">
+                                    <span>${{ number_format($product->price, 2) }}</span>
+                                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm">
+                                        View Detail
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="absolute top-8 right-0 mt-1 w-32 bg-white rounded-md shadow-lg py-1 z-50 transition-all duration-200 ease-out origin-top-right"
+                                 x-show="open"
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 scale-95"
+                                 x-transition:enter-end="opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-200"
+                                 x-transition:leave-start="opacity-100 scale-100"
+                                 x-transition:leave-end="opacity-0 scale-95"
+                                 style="display: none">
+                                <a href="#"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-100/90 hover:text-blue-600 transition-all duration-200 ease-in-out">
+                                    <i class='bx bx-edit mr-2'></i>Edit
+                                </a>
+                                <a href="#"
+                                   class="block px-4 py-2 text-sm text-red-600 hover:bg-red-100/90 hover:text-red-700 transition-all duration-200 ease-in-out">
+                                    <i class='bx bx-trash mr-2'></i>Delete
+                                </a>
                             </div>
                         </div>
+                    @endforeach
 
-                        <div class="flex flex-col flex-grow px-2 pb-1.5">
-                            <p class="my-1 line-clamp-2">Nike shoe</p>
-                            <p class="text-sm text-gray-500">2h ago by <span class="text-cyan-500">Thy Smos</span></p>
-                            <div class="flex justify-between items-end mt-4">
-                                <span>$90.00</span>
-                                <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm">
-                                    View Detail
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="absolute top-8 -right-8 mt-1 w-32 bg-white rounded-md shadow-lg py-1 z-50 transition-all duration-200 ease-out origin-top-right"
-                             x-show="open"
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 scale-95"
-                             x-transition:enter-end="opacity-100 scale-100"
-                             x-transition:leave="transition ease-in duration-200"
-                             x-transition:leave-start="opacity-100 scale-100"
-                             x-transition:leave-end="opacity-0 scale-95"
-                             style="display: none">
-                            <a href="#"
-                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-100/90 hover:text-blue-600 transition-all duration-200 ease-in-out">
-                                <i class='bx bx-edit mr-2'></i>Edit
-                            </a>
-                            <a href="#"
-                               class="block px-4 py-2 text-sm text-red-600 hover:bg-red-100/90 hover:text-red-700 transition-all duration-200 ease-in-out">
-                                <i class='bx bx-trash mr-2'></i>Delete
-                            </a>
-                        </div>
-                    </div>
-
-                @endforeach
-
-            </div>
+                </div>
+            @else
+                <div class="grid place-content-center h-1/2">
+                    <h2 class="text-2xl text-blue-950">No Post Available</h2>
+                </div>
+            @endif
 
         </div>
     </div>
