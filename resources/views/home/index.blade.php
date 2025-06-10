@@ -11,7 +11,7 @@
     <header class="bg-slate-800 text-white px-8 py-4">
         <div class="mb-4 flex justify-between items-center">
             <div>
-                <h1 class="text-2xl">E-Market</h1>
+                <a href="{{ route('home') }}" class="text-2xl">E-Market</a>
             </div>
             <nav class="gap-6 font-semibold hidden md:flex">
                 <a href="/" class="text-amber-600">HOME</a>
@@ -62,7 +62,7 @@
                             style="display: none"
                         >
                             <a
-                                href="#"
+                                href="{{ route('profile') }}"
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-100/90 hover:text-blue-600 transition-all duration-200 ease-in-out"
                             >
                                 <i class='bx bx-user mr-2'></i>My Profile
@@ -145,49 +145,27 @@
                 </div>
             </div>
             <div>
-                <h2 class="mb-4">LATEST PRODUCTS</h2>
+                <h2 class="mb-4 font-bold">LATEST PRODUCTS</h2>
                 <div class="latest-product">
-                    <div>
-                        <div class="img">
-                            <img src="https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg" alt="" />
-                        </div>
+
+                    @foreach($latestProducts as $latest)
                         <div>
-                            <p>Adidas shoes</p>
-                            <span class="text-amber-500">$64.00</span>
+                            <div class="img">
+                                <img src="{{ $latest->images->first()->image_url }}" alt="{{ $latest->title }}" />
+                            </div>
+                            <div>
+                                <p>Adidas shoes</p>
+                                <span class="text-amber-500">${{ number_format($latest->price, 2) }}</span>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <div class="img">
-                            <img src="https://plus.unsplash.com/premium_photo-1664392147011-2a720f214e01?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D" alt="" />
-                        </div>
-                        <div>
-                            <p>Girl beg</p>
-                            <span class="text-amber-500">$64.00</span>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="img">
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1Z2hl8RAvyhzhHYErVp_wc_31v59q5N9w-dJQa2fSaN5pa-HInoxYoZ3_07VjDtEXN30&usqp=CAU" alt="" />
-                        </div>
-                        <div>
-                            <p>Beauty product</p>
-                            <span class="text-amber-500">$64.00</span>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="img">
-                            <img src="https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg" alt="" />
-                        </div>
-                        <div>
-                            <p>Adidas shoes</p>
-                            <span class="text-amber-500">$64.00</span>
-                        </div>
-                    </div>
+                    @endforeach
+
                 </div>
             </div>
         </aside>
 
         <section class="col-span-full md:col-span-9 h-full mt-3">
+
             <div class="flex justify-between items-center">
                 <div class="bg-slate-700 text-white py-2 px-4">
                     TRENDING ITEMS
@@ -202,67 +180,27 @@
                 </div>
             </div>
 
-            <div class="mt-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                <div class="flex flex-col shadow-lg p-2">
-                    <div class="w-full h-full rounded-sm overflow-hidden">
-                        <img class="w-full h-full object-cover" src="https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg" alt="" />
-                    </div>
-                    <div>
-                        <p class="my-2">Adidas shoes</p>
-                        <div class="flex justify-between items-end">
-                            <span>$64.00</span>
-                            <span class="text-xl py-1 cursor-pointer rounded-sm px-2 bg-slate-600 text-white"><i class='bx bx-cart-plus'  ></i> </span>
+            <div class="my-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+
+                @foreach($products as $product)
+                    <div class="flex flex-col shadow-lg p-2 h-full">
+                        <div class="w-full aspect-square rounded-sm overflow-hidden mb-2">  <!-- or aspect-[4/3] -->
+                            <img class="w-full h-full object-cover"
+                                 src="{{ $product->images->first()->image_url }}"
+                                 alt="{{ $product->title }}" />
+                        </div>
+                        <div class="flex flex-col flex-grow">
+                            <p class="my-2 line-clamp-2">{{ $product->title }}</p>
+                            <div class="flex justify-between items-end mt-auto">
+                                <span>${{ number_format($product->price, 2) }}</span>
+                                <span class="text-xl py-1 cursor-pointer rounded-sm px-2 bg-slate-600 text-white">
+                                    <i class='bx bx-cart-plus'></i>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="flex flex-col shadow-lg p-2">
-                    <div class="w-full h-full rounded-sm overflow-hidden">
-                        <img class="w-full h-full object-cover" src="https://plus.unsplash.com/premium_photo-1664392147011-2a720f214e01?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D" alt="" />
-                    </div>
-                    <div>
-                        <p class="my-2">Adidas shoes</p>
-                        <div class="flex justify-between items-end">
-                            <span>$64.00</span>
-                            <span class="text-xl py-1 cursor-pointer rounded-sm px-2 bg-slate-600 text-white"><i class='bx bx-cart-plus'  ></i> </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-col shadow-lg p-2">
-                    <div class="w-full h-full rounded-sm overflow-hidden">
-                        <img class="w-full h-full object-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1Z2hl8RAvyhzhHYErVp_wc_31v59q5N9w-dJQa2fSaN5pa-HInoxYoZ3_07VjDtEXN30&usqp=CAU" alt="" />
-                    </div>
-                    <div>
-                        <p class="my-2">Adidas shoes</p>
-                        <div class="flex justify-between items-end">
-                            <span>$64.00</span>
-                            <span class="text-xl py-1 cursor-pointer rounded-sm px-2 bg-slate-600 text-white"><i class='bx bx-cart-plus'  ></i> </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-col shadow-lg p-2">
-                    <div class="w-full h-full rounded-sm overflow-hidden">
-                        <img class="w-full h-full object-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLcW90dVPhS7TDm-rr3jmjoneXpcH2g-2SmpYYtQbT_r4HUy-SxwIVDWwlX2E_916F0nY&usqp=CAU" alt="" />
-                    </div>
-                    <div>
-                        <p class="my-2">Adidas shoes</p>
-                        <div class="flex justify-between items-end">
-                            <span>$64.00</span>
-                            <span class="text-xl py-1 cursor-pointer rounded-sm px-2 bg-slate-600 text-white"><i class='bx bx-cart-plus'  ></i> </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-col shadow-lg p-2">
-                    <div class="w-full h-full rounded-sm overflow-hidden">
-                        <img class="w-full h-full object-cover" src="https://m.media-amazon.com/images/I/61ttw0sasbL.jpg" alt="" />
-                    </div>
-                    <div>
-                        <p class="my-2">Adidas shoes</p>
-                        <div class="flex justify-between items-end">
-                            <span>$64.00</span>
-                            <span class="text-xl py-1 cursor-pointer rounded-sm px-2 bg-slate-600 text-white"><i class='bx bx-cart-plus'  ></i> </span>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
+
             </div>
         </section>
     </main>

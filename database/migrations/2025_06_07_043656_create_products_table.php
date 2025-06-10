@@ -18,7 +18,8 @@ return new class extends Migration
             $table->foreign('seller_id')->references('id')->on('users');
             $table->string('title');
             $table->text('description')->nullable();
-            $table->enum('category', ["electronics","clothing","home","books","other"]);
+            $table->enum('category', ["electronics","Gifts & Toys","Fashion & Accessories","Begs & Shoes","
+Bathroom", "Health & Beauty", "Home & Light", "Bedroom"]);
             $table->integer('quantity')->default(1);
             $table->decimal('price', 10, 2);
             $table->enum('status', ["available","sold"]);

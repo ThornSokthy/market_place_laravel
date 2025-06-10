@@ -17,7 +17,8 @@ class ProductFactory extends Factory
      */
     public function definition()
     {
-        $categories = ["electronics", "clothing", "home", "books", "other"];
+        $categories = ["electronics","Gifts & Toys","Fashion & Accessories","Begs & Shoes","
+Bathroom", "Health & Beauty", "Home & Light", "Bedroom"];
         $statuses = ["available", "sold"];
 
         return [
