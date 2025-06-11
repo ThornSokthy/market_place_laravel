@@ -89,7 +89,13 @@
     </div>
 </header>
 
-    <div class="w-full max-w-full mx-auto bg-white shadow-sm overflow-hidden">
+    <div
+        x-data="{
+        showDeleteModal: false,
+             deleting: false,
+             deleteItem: null,
+        }"
+        class="relative w-full max-w-full mx-auto bg-white shadow-sm overflow-hidden">
 
         <div class="h-40 bg-gradient-to-r from-blue-500 to-purple-600 relative">
             <img src="https://images.pexels.com/photos/378570/pexels-photo-378570.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
@@ -111,10 +117,221 @@
                     <p class="text-sm text-gray-500">Member since August 2017</p>
                 </div>
 
-                <div class="flex justify-between md:justify-end items-center w-full gap-6 mt-4 border-gray-100 pt-3">
-                    <button class="bg-amber-500 px-5 py-2.5 rounded-md text-sm font-medium cursor-pointer text-white hover:bg-amber-600 transition-colors">
+                <div x-data="{
+                    showModal: false,
+                    files: [],
+                    previews: [],
+                    handleFileSelect(event) {
+                        const selectedFiles = Array.from(event.target.files);
+                        this.files = [...this.files, ...selectedFiles];
+
+                        // Generate previews for new files
+                        selectedFiles.forEach(file => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                this.previews.push({
+                                    id: Date.now() + Math.random().toString(36).substring(2),
+                                    url: e.target.result,
+                                    file: file
+                                });
+                            };
+                            reader.readAsDataURL(file);
+                        });
+                    },
+                    removePreview(index) {
+                        this.previews.splice(index, 1);
+                        this.files.splice(index, 1);
+                    }
+                 }" class="flex justify-between md:justify-end items-center w-full gap-6 mt-4 border-gray-100 pt-3">
+
+                    <button
+                        class="bg-amber-500 px-5 py-2 rounded-md text-sm font-medium cursor-pointer text-white hover:bg-amber-600 transition-colors"
+                        @click="showModal = true"
+                    >
                         Add Post
                     </button>
+
+                    <div
+                        x-show="showModal"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0"
+                        x-transition:enter-end="opacity-100"
+                        x-transition:leave="transition ease-in duration-300"
+                        x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0"
+                        class="px-3 pb-5 max-w-[480px] h-fit overflow-y-auto mx-auto bg-white drop-shadow-2xl rounded-md bg-opacity-75 transition duration-150 ease-in-out z-10 fixed top-8 right-0 bottom-0 left-0"
+                        style="display: none;"
+                        @click.away="showModal = false"
+                    >
+                        <div class=" p-4 rounded-lg m-auto max-w-md">
+                            <h2 class="text-xl font-bold mb-4">Add Post</h2>
+                            <form action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+
+                                <div>
+                                    <label for="title" class="text-gray-800 text-sm font-bold leading-tight tracking-normal">Title</label>
+                                    <input id="title" class="mb-3 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border"
+                                           name="title"
+                                           placeholder="Title"
+                                    />
+                                </div>
+
+                                <div class="mb-3 relative">
+                                    <label for="category" class="text-gray-800 text-sm font-bold leading-tight tracking-normal">Category</label>
+                                    <div class="relative">
+                                        <select
+                                            id="category"
+                                            class="mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 pr-8 text-sm border-gray-300 rounded border appearance-none bg-white "
+                                            name="category"
+                                            required
+                                        >
+                                            <option value="electronics" selected>Electronics</option>
+                                            <option value="Gifts & Toys">Gifts & Toys</option>
+                                            <option value="Fashion & Accessories">Fashion & Accessories</option>
+                                            <option value="Bags & Shoes">Bags & Shoes</option>
+                                            <option value="Bathroom">Bathroom</option>
+                                            <option value="Health & Beauty">Health & Beauty</option>
+                                            <option value="Home & Light">Home & Light</option>
+                                            <option value="Bedroom">Bedroom</option>
+                                        </select>
+
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 top-1/2 transform -translate-y-1/2">
+                                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between mb-3">
+                                    <div>
+                                        <label for="price" class="text-gray-800 text-sm font-bold leading-tight tracking-normal">Price</label>
+                                        <input id="price" class=" mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border"
+                                               name="price"
+                                               step="0.01"
+                                                min="0.01"
+                                                value="1.00"
+                                               type="number"
+                                               placeholder="Price"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="quantity" class="text-gray-800 text-sm font-bold leading-tight tracking-normal">Quantity</label>
+                                        <input id="quantity" class=" mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border"
+                                               name="quantity"
+                                               value="1"
+                                               min="1"
+                                               type="number"
+                                               placeholder="Quantity"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="description" class="text-gray-800 text-sm font-bold leading-tight tracking-normal">Description</label>
+                                    <textarea
+                                        id="description"
+                                        class="mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full flex items-center pl-3 pt-2 text-sm border-gray-300 rounded border"
+                                        name="description"
+                                        rows="4"
+                                        placeholder="Enter post description"
+                                    ></textarea>
+                                </div>
+
+
+                                <div class="mb-3">
+                                    <label class="text-gray-800 text-sm font-bold leading-tight tracking-normal">Images</label>
+                                    <div class="mt-2">
+
+                                        <div x-show="previews.length === 0" class="flex items-center justify-center w-full">
+                                            <label class="flex flex-col w-full h-32 border-2 border-dashed rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all cursor-pointer">
+                                                <div class="flex flex-col items-center justify-center pt-7">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                    </svg>
+                                                    <p class="pt-1 text-sm tracking-wider text-gray-400">Click to upload or drag and drop</p>
+                                                    <p class="text-xs text-gray-400 mt-1">PNG, JPG, JPEG up to 5MB</p>
+                                                </div>
+                                                <input
+                                                    type="file"
+                                                    name="images[]"
+                                                    class="opacity-0 absolute"
+                                                    multiple
+                                                    accept="image/*"
+                                                    @change="handleFileSelect($event)"
+                                                />
+                                            </label>
+                                        </div>
+
+
+                                        <div x-show="previews.length > 0" class="mt-4">
+                                            <div>
+                                                <div class="flex justify-between items-center mb-2">
+                                                    <h4 class="text-sm font-medium text-gray-700">Selected Images</h4>
+                                                    <button
+                                                        type="button"
+                                                        @click="previews = []; files = [];"
+                                                        class="text-xs text-indigo-600 hover:text-indigo-800"
+                                                    >
+                                                        Clear All
+                                                    </button>
+                                                </div>
+                                                <div class="grid grid-cols-4 gap-3">
+                                                    <template x-for="(preview, index) in previews" :key="preview.id">
+                                                        <div class="relative group h-16">
+                                                            <img
+                                                                :src="preview.url"
+                                                                class="w-full h-full object-cover rounded border"
+                                                                :alt="'Preview ' + (index + 1)"
+                                                            >
+                                                            <button
+                                                                type="button"
+                                                                @click="removePreview(index)"
+                                                                class="absolute cursor-pointer top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                aria-label="Remove image"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </template>
+                                                </div>
+
+                                                <button
+                                                    type="button"
+                                                    @click="$refs.fileInput.click()"
+                                                    class="mt-3 text-sm text-indigo-600 hover:text-indigo-800 flex items-center"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                    </svg>
+                                                    Add more images
+                                                </button>
+                                                <input
+                                                    x-ref="fileInput"
+                                                    type="file"
+                                                    name="images[]"
+                                                    class="hidden"
+                                                    multiple
+                                                    accept="image/*"
+                                                    @change="handleFileSelect($event)"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="flex items-center justify-start w-full">
+                                    <button type="submit" class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 transition duration-150 ease-in-out hover:bg-indigo-600 bg-indigo-700 rounded text-white px-8 py-2 text-sm">Submit</button>
+                                    <button @click="showModal = false" class="focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-gray-400 ml-3 bg-gray-100 transition duration-150 text-gray-600 ease-in-out hover:border-gray-400 hover:bg-gray-300 border rounded px-8 py-2 text-sm" onclick="modalHandler()">Cancel</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+
                     <div class="flex gap-6">
                         <div class="text-center">
                             <p class="text-sm text-gray-500">Events</p>
@@ -126,6 +343,8 @@
                         </div>
                     </div>
                 </div>
+
+
             </div>
         </div>
 
@@ -145,8 +364,8 @@
                 <div class="my-6 px-4 sm:px-16 md:px-20 lg:px-28 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
 
                     @foreach($products as $product)
-                        <div class="flex flex-col shadow-lg p-2 h-full relative"
-                             x-data="{
+        <div class="flex flex-col shadow-lg p-2 h-full relative"
+             x-data="{
              open: false,
              currentSlide: 0,
              totalSlides: {{ $product->images->count() }},
@@ -228,11 +447,11 @@
                                 @endif
 
                                 <div class="absolute top-2 right-2">
-                <span class="text-2xl py-1 cursor-pointer rounded-full w-8 h-8 flex items-center justify-center bg-white/80 text-gray-800 hover:bg-white transition-all"
-                      @click="open = !open"
-                      @click.outside="open = false">
-                    <i class='bx bx-dots-horizontal-rounded'></i>
-                </span>
+                                    <span class="text-2xl py-1 cursor-pointer rounded-full w-8 h-8 flex items-center justify-center bg-white/80 text-gray-800 hover:bg-white transition-all"
+                                          @click="open = !open"
+                                          @click.outside="open = false">
+                                        <i class='bx bx-dots-horizontal-rounded'></i>
+                                    </span>
                                 </div>
                             </div>
 
@@ -259,14 +478,20 @@
                                  x-transition:leave-start="opacity-100 scale-100"
                                  x-transition:leave-end="opacity-0 scale-95"
                                  style="display: none">
+
                                 <a href="#"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-100/90 hover:text-blue-600 transition-all duration-200 ease-in-out">
                                     <i class='bx bx-edit mr-2'></i>Edit
                                 </a>
-                                <a href="#"
-                                   class="block px-4 py-2 text-sm text-red-600 hover:bg-red-100/90 hover:text-red-700 transition-all duration-200 ease-in-out">
+
+
+                                <button
+                                    @click="showDeleteModal = true; deleteItem = {{ $product->id }}"
+                                    class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-100/90 hover:text-red-700 transition-all duration-200 ease-in-out"
+                                >
                                     <i class='bx bx-trash mr-2'></i>Delete
-                                </a>
+                                </button>
+
                             </div>
                         </div>
                     @endforeach
@@ -279,6 +504,61 @@
             @endif
 
         </div>
+
+        <div class="absolute top-1/3 right-0 left-0 mx-auto mt-1 w-[340px] bg-white rounded-md shadow-lg py-1 z-50 transition-all duration-200 ease-out origin-top-right"
+             x-show="showDeleteModal"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             style="display: none"
+        >
+
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-full">
+                <div class="p-6">
+                    <h3 class="text-lg font-medium text-gray-900">Confirm Deletion</h3>
+                    <p class="mt-2 text-sm text-gray-600">Are you sure you want to delete this item? This action cannot be undone.</p>
+
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-lg">
+
+                        <form
+                            :action="`/posts/${deleteItem}`" method="POST"
+                            @submit="deleting = true"
+                        >
+                            @csrf
+                            @method('DELETE')
+                            <button
+                                type="submit"
+                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+                                :disabled="deleting"
+                            >
+                                <span x-show="!deleting">Delete</span>
+                                <span x-show="deleting" class="flex items-center">
+                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Deleting...
+                                </span>
+                            </button>
+                        </form>
+
+                        <button
+                            @click="showDeleteModal = !showDeleteModal"
+                            type="button"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                            :disabled="deleting"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
 

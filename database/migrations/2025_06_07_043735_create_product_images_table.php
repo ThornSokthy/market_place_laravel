@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->foreign('product_id')->references('id')->on('products');
             $table->string('image_url');
-            $table->boolean('is_primary');
+            $table->boolean('is_primary')->default(false);
             $table->timestamps();
         });
         Schema::enableForeignKeyConstraints();

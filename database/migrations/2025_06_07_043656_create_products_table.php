@@ -23,7 +23,7 @@ Bathroom", "Health & Beauty", "Home & Light", "Bedroom"]);
             $table->integer('quantity')->default(1);
             $table->decimal('price', 10, 2);
             $table->enum('status', ["available","sold"]);
-            $table->boolean('is_active');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
         Schema::enableForeignKeyConstraints();

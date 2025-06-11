@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Route;
 Route::get("/", [ProductController::class, "index"])->name("home");
 Route::get("/profile", [UserController::class, "getProfile"])->name("profile");
 
+Route::post('/posts', [ProductController::class, 'store'])->name('posts.store');
+Route::delete('/posts/{id}', [ProductController::class, 'destroy'])->name('posts.destroy');
+
 Route::view('/login', 'auth.login')->name('login');
 Route::view('/register', 'auth.register')->name('register');
 
