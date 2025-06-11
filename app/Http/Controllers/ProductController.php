@@ -7,7 +7,6 @@ use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Psy\Util\Str;
 
 class ProductController extends Controller
 {
@@ -75,6 +74,56 @@ class ProductController extends Controller
         $product->save();
 
         return redirect()->back()->with('success', 'Product deleted successfully!');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'quantity' => 'required|numeric',
+            'category' => 'required|string',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max
+            'images_to_delete.*' => 'sometimes|integer'
+        ]);
+
+        $oldProduct = Product::with('images')->findOrFail($id);
+
+        if ($request->hasFile('images_to_delete')) {
+            foreach ($request->images_to_delete as $imageId) {
+                $image = $oldProduct->images()->find($imageId);
+
+                if ($image) {
+                    $imagePath = str_replace('/storage/', '', $image->image_url);
+                    Storage::disk('public')->delete($imagePath);
+                    $image->delete();
+                }
+            }
+        }
+        $oldProduct->update([
+            'title' => $validated['title'],
+            'price' => $validated['price'],
+            'description' => $validated['description'],
+            'category' => $validated['category'],
+            'quantity' => $validated['quantity'],
+        ]);
+
+        if ($request->hasFile('images')) {
+
+            foreach ($request->file('images') as $index => $image) {
+                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $path = $image->storeAs('uploads/products', $filename, 'public');
+
+                ProductImage::create([
+                    'product_id' => $oldProduct->id,
+                    'image_url' => Storage::url($path),
+                    'is_primary' => $index === 0,
+                ]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Product updated successfully!');
     }
 
 }

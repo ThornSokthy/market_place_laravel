@@ -91,9 +91,69 @@
 
     <div
         x-data="{
-        showDeleteModal: false,
+            showDeleteModal: false,
              deleting: false,
              deleteItem: null,
+             showModal: false,
+             isEditing: false,
+             currentPost: {
+                    title: '',
+                    description: '',
+                    category: '',
+                    price: 1,
+                    quantity: 1
+                },
+            files: [],
+            previews: [],
+            imagesToDelete: [],
+
+            initForm(post = null) {
+                this.isEditing = post !== null;
+                this.currentPost = post || {
+                    title: '',
+                    description: '',
+                    category: '',
+                    price: 1,
+                    quantity: 1
+                }
+                this.files = [];
+                this.previews = post?.images?.map(item => ({
+                    id: item.id,
+                    url: item.image_url,
+                    isExisting: true
+                })) || [];
+                this.imagesToDelete = [];
+            },
+
+            handleFileSelect(event) {
+                const selectedFiles = Array.from(event.target.files);
+                this.files = selectedFiles;
+                this.previews = this.previews.filter(p => p.isExisting);
+                selectedFiles.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.previews.push({
+                            id: Date.now() + Math.random().toString(36).substring(2),
+                            url: e.target.result,
+                            file: file,
+                            isExisting: false
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                });
+            },
+            removePreview(index) {
+                const preview = this.previews[index];
+                if (preview.isExisting) {
+                    this.imagesToDelete.push(preview.id);
+                } else {
+                    const fileIndex = this.files.findIndex(f => f.name === preview.file.name);
+                    if (fileIndex !== -1) {
+                        this.files.splice(fileIndex, 1);
+                    }
+                }
+                this.previews.splice(index, 1);
+            }
         }"
         class="relative w-full max-w-full mx-auto bg-white shadow-sm overflow-hidden">
 
@@ -117,36 +177,11 @@
                     <p class="text-sm text-gray-500">Member since August 2017</p>
                 </div>
 
-                <div x-data="{
-                    showModal: false,
-                    files: [],
-                    previews: [],
-                    handleFileSelect(event) {
-                        const selectedFiles = Array.from(event.target.files);
-                        this.files = [...this.files, ...selectedFiles];
-
-                        // Generate previews for new files
-                        selectedFiles.forEach(file => {
-                            const reader = new FileReader();
-                            reader.onload = (e) => {
-                                this.previews.push({
-                                    id: Date.now() + Math.random().toString(36).substring(2),
-                                    url: e.target.result,
-                                    file: file
-                                });
-                            };
-                            reader.readAsDataURL(file);
-                        });
-                    },
-                    removePreview(index) {
-                        this.previews.splice(index, 1);
-                        this.files.splice(index, 1);
-                    }
-                 }" class="flex justify-between md:justify-end items-center w-full gap-6 mt-4 border-gray-100 pt-3">
+                <div class="flex justify-between md:justify-end items-center w-full gap-6 mt-4 border-gray-100 pt-3">
 
                     <button
                         class="bg-amber-500 px-5 py-2 rounded-md text-sm font-medium cursor-pointer text-white hover:bg-amber-600 transition-colors"
-                        @click="showModal = true"
+                        @click="initForm(); showModal = true"
                     >
                         Add Post
                     </button>
@@ -164,15 +199,21 @@
                         @click.away="showModal = false"
                     >
                         <div class=" p-4 rounded-lg m-auto max-w-md">
-                            <h2 class="text-xl font-bold mb-4">Add Post</h2>
-                            <form action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
+                            <h2 class="text-xl font-bold mb-4" x-text="isEditing ? 'Edit Post' : 'Add Post'"></h2>
+                            <form
+                                :action="isEditing ? '/posts/' + currentPost.id : '/posts'"
+                                method="POST" enctype="multipart/form-data">
                                 @csrf
+                                <template x-if="isEditing">
+                                    @method('PUT')
+                                </template>
 
                                 <div>
                                     <label for="title" class="text-gray-800 text-sm font-bold leading-tight tracking-normal">Title</label>
                                     <input id="title" class="mb-3 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border"
                                            name="title"
                                            placeholder="Title"
+                                           x-model="currentPost.title"
                                     />
                                 </div>
 
@@ -184,6 +225,7 @@
                                             class="mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 pr-8 text-sm border-gray-300 rounded border appearance-none bg-white "
                                             name="category"
                                             required
+                                            x-model="currentPost.category"
                                         >
                                             <option value="electronics" selected>Electronics</option>
                                             <option value="Gifts & Toys">Gifts & Toys</option>
@@ -213,6 +255,7 @@
                                                 value="1.00"
                                                type="number"
                                                placeholder="Price"
+                                               x-model="currentPost.price"
                                         />
                                     </div>
                                     <div>
@@ -223,6 +266,7 @@
                                                min="1"
                                                type="number"
                                                placeholder="Quantity"
+                                               x-model="currentPost.quantity"
                                         />
                                     </div>
                                 </div>
@@ -235,13 +279,17 @@
                                         name="description"
                                         rows="4"
                                         placeholder="Enter post description"
+                                        x-text="currentPost?.description"
                                     ></textarea>
                                 </div>
-
 
                                 <div class="mb-3">
                                     <label class="text-gray-800 text-sm font-bold leading-tight tracking-normal">Images</label>
                                     <div class="mt-2">
+
+                                        <template x-for="id in imagesToDelete" :key="id">
+                                            <input type="hidden" name="images_to_delete[]" :value="id" />
+                                        </template>
 
                                         <div x-show="previews.length === 0" class="flex items-center justify-center w-full">
                                             <label class="flex flex-col w-full h-32 border-2 border-dashed rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all cursor-pointer">
@@ -262,7 +310,6 @@
                                                 />
                                             </label>
                                         </div>
-
 
                                         <div x-show="previews.length > 0" class="mt-4">
                                             <div>
@@ -319,12 +366,12 @@
                                                 />
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
 
-
                                 <div class="flex items-center justify-start w-full">
-                                    <button type="submit" class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 transition duration-150 ease-in-out hover:bg-indigo-600 bg-indigo-700 rounded text-white px-8 py-2 text-sm">Submit</button>
+                                    <button type="submit" class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 transition duration-150 ease-in-out hover:bg-indigo-600 bg-indigo-700 rounded text-white px-8 py-2 text-sm"><span x-text="isEditing ? 'Update' : 'Submit'"></span></button>
                                     <button @click="showModal = false" class="focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-gray-400 ml-3 bg-gray-100 transition duration-150 text-gray-600 ease-in-out hover:border-gray-400 hover:bg-gray-300 border rounded px-8 py-2 text-sm" onclick="modalHandler()">Cancel</button>
                                 </div>
                             </form>
@@ -364,40 +411,40 @@
                 <div class="my-6 px-4 sm:px-16 md:px-20 lg:px-28 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
 
                     @foreach($products as $product)
-        <div class="flex flex-col shadow-lg p-2 h-full relative"
-             x-data="{
-             open: false,
-             currentSlide: 0,
-             totalSlides: {{ $product->images->count() }},
-             autoSlideInterval: null,
-             init() {
-                 if (this.totalSlides > 1) {
-                     this.startAutoSlide();
-                     this.$watch('currentSlide', (value) => {
-                         if (value >= this.totalSlides) this.currentSlide = 0;
-                         if (value < 0) this.currentSlide = this.totalSlides - 1;
-                     });
-                 }
-             },
-             startAutoSlide() {
-                 this.autoSlideInterval = setInterval(() => {
-                     this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
-                 }, 5000);
-             },
-             stopAutoSlide() {
-                 clearInterval(this.autoSlideInterval);
-             },
-             nextSlide() {
-                 this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
-                 this.stopAutoSlide();
-                 setTimeout(() => this.startAutoSlide(), 5000);
-             },
-             prevSlide() {
-                 this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
-                 this.stopAutoSlide();
-                 setTimeout(() => this.startAutoSlide(), 5000);
-             }
-         }">
+                            <div class="flex flex-col shadow-lg p-2 h-full relative"
+                                 x-data="{
+                                 open: false,
+                                 currentSlide: 0,
+                                 totalSlides: {{ $product->images->count() }},
+                                 autoSlideInterval: null,
+                                 init() {
+                                     if (this.totalSlides > 1) {
+                                         this.startAutoSlide();
+                                         this.$watch('currentSlide', (value) => {
+                                             if (value >= this.totalSlides) this.currentSlide = 0;
+                                             if (value < 0) this.currentSlide = this.totalSlides - 1;
+                                         });
+                                     }
+                                 },
+                                 startAutoSlide() {
+                                     this.autoSlideInterval = setInterval(() => {
+                                         this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+                                     }, 5000);
+                                 },
+                                 stopAutoSlide() {
+                                     clearInterval(this.autoSlideInterval);
+                                 },
+                                 nextSlide() {
+                                     this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+                                     this.stopAutoSlide();
+                                     setTimeout(() => this.startAutoSlide(), 5000);
+                                 },
+                                 prevSlide() {
+                                     this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
+                                     this.stopAutoSlide();
+                                     setTimeout(() => this.startAutoSlide(), 5000);
+                                 }
+                             }">
 
                             <div class="w-full aspect-square rounded-sm overflow-hidden mb-2 relative"
                                  @mouseenter="stopAutoSlide()"
@@ -480,6 +527,7 @@
                                  style="display: none">
 
                                 <a href="#"
+                                   @click.prevent="initForm({{ $product->toJson() }}); showModal = true"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-100/90 hover:text-blue-600 transition-all duration-200 ease-in-out">
                                     <i class='bx bx-edit mr-2'></i>Edit
                                 </a>
@@ -562,8 +610,7 @@
     </div>
 
 
-
-<footer class="mt-4 bg-slate-800 text-white py-8 px-4">
+    <footer class="mt-4 bg-slate-800 text-white py-8 px-4">
     <div class="container mx-auto max-w-6xl">
         <div class="flex flex-col md:flex-row justify-between mb-8">
             <div class="mb-6 md:mb-0">
