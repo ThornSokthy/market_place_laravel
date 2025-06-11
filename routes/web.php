@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get("/", [ProductController::class, "index"])->name("home");
 Route::get("/profile", [UserController::class, "getProfile"])->name("profile");
+Route::get('/order', [UserController::class, 'getOrder'])->name("order");
 
 Route::post('/posts', [ProductController::class, 'store'])->name('posts.store');
 Route::delete('/posts/{id}', [ProductController::class, 'destroy'])->name('posts.destroy');

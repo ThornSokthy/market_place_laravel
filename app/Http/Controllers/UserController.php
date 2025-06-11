@@ -16,4 +16,11 @@ class UserController extends Controller
             ->get();
         return view('profile.index', ['products' => $products]);
     }
+    public function getorder() {
+        $products = Product::with(['seller', 'images'])
+            ->where('is_active', true)
+            ->where('seller_id', auth()->id())
+            ->get();
+    return view('order.index',['products' => $products]);
+}
 }
