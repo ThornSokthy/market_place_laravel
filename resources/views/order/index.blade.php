@@ -5,12 +5,6 @@
     <title>{{ env(".APP_NAME") }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; 
-        }
-    </style>
 </head>
 <body>
 
@@ -94,123 +88,157 @@
         @endauth
     </div>
     </header>
-    <div class="p-4 md:p-8 lg:p-12">
-        <div class="container mx-auto max-w-7xl">
-            <div class="flex flex-col lg:flex-row gap-8">
-                <div class="lg:w-3/4 bg-white rounded-xl shadow-md p-6">
-                    <div class="grid grid-cols-12 gap-1 text-lg text-white bg-amber-600 rounded-lg p-4 mb-4">
-                        <div class="col-span-1"></div> 
-                        <div class="col-span-5 md:col-span-4">Product</div>
-                        <div class="col-span-2 md:col-span-2 text-center md:text-left">Price</div>
-                        <div class="col-span-2 md:col-span-3 text-center">Quantity</div>
-                        <div class="col-span-2 md:col-span-2 text-right">Connetion</div>
-                    </div>
 
-                    <div class="grid grid-cols-12 items-center gap-4 py-4 border-b border-gray-200">
-                        <div class="col-span-1 ">
-                            
-                        </div>
-                        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
-                            <img src="https://placehold.jp/150x150.png" class="w-14 h-14 rounded-lg object-cover shadow-sm">
-                            <div>
-                                <p class="font-medium text-black">T-Shirt</p>
+    <main class="w-full py-6 px-4 sm:px-16 md:px-16 lg:px-36">
+
+        <h1 class="mb-2 text-3xl font-semibold text-center ">Shopping Cart</h1>
+        <div class="text-center text-sm font-semibold text-gray-600">
+            <a>Home</a>
+            <span>/</span>
+            <a>Shopping Cart</a>
+        </div>
+
+        <div class="flex flex-col md:flex-row  justify-between gap-12 mt-8">
+            <div class="flex-1/3">
+
+                <div class="bg-amber-400 py-2 rounded-md mt-6 px-2 flex items-center justify-between text-sm font-semibold text-gray-600 uppercase">
+                    <div class="flex items-center gap-6">
+                        <span class="w-6 md:w-12"></span>
+                        <span class="min-w-[8rem]">Product</span>
+                    </div>
+                    <div class="text-center min-w-[4rem]">Qty</div>
+                    <div class="min-w-[6rem] text-center">Action</div>
+                </div>
+
+                <div class="mt-3 space-y-4">
+
+                    <div class="flex items-center justify-between gap-4 border-b border-gray-200 hover:bg-gray-50 transition-all duration-200 rounded-lg cart-row">
+                        <div class="flex items-center gap-1.5 md:gap-6">
+                            <button class=" transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+
+                            <div class="flex items-center gap-4">
+                                <div class="h-12 w-12 sm:h-16 sm:w-16 rounded-md overflow-hidden shadow-sm">
+                                    <img class="w-full h-full object-cover" src="https://plus.unsplash.com/premium_photo-1664392147011-2a720f214e01?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8xfxxcHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D" alt="" />
+                                </div>
+                                <div>
+                                    <p class="font-medium text-sm md:text-base text-gray-800">Fresh Oranges</p>
+                                    <p class="text-xs text-gray-500">$11.75</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-span-2 md:col-span-2 text-center md:text-left font-bold text-black ">$1.00</div>
-                        <div class="col-span-2 md:col-span-3 flex items-center justify-center space-x-1">
-                            <span class="font-bold">1</span>
-                        </div>
-                        <button class="col-span-2 md:col-span-2 text-center text-white bg-amber-600 text-white py-1 px-2 rounded-md hover:bg-amber-500">Click me</button>
-                    </div>
 
-                    <div class="grid grid-cols-12 items-center gap-4 py-4 border-b border-gray-200">
-                        <div class="col-span-1 flex justify-center">
-                            
+                        <div class="flex items-center justify-center space-x-2 quantity-controls">
+                            <span class="font-bold text-gray-800 min-w-[1.5rem] text-center">4</span>
                         </div>
-                        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
-                            <img src="https://placehold.jp/150x150.png"  class="w-14 h-14 rounded-lg object-cover shadow-sm">
-                            <div>
-                                <p class="font-medium text-black">T-Shirt</p>
+
+                        <button class="text-white cursor-pointer flex items-center gap-1.5 bg-amber-400 px-2.5 py-1 rounded-md">
+                            <span><i class='bx  bx-phone-forwarding'  ></i></span>
+                            <span class="text-md font-semibold hidden sm:block">contact</span>
+                        </button>
+
+                    </div>
+                    <div class="flex items-center justify-between gap-4 border-b border-gray-200 hover:bg-gray-50 transition-all duration-200 rounded-lg cart-row">
+                        <div class="flex items-center gap-1.5 md:gap-6">
+                            <button class=" transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+
+                            <div class="flex items-center gap-4">
+                                <div class="h-12 w-12 sm:h-16 sm:w-16 rounded-md overflow-hidden shadow-sm">
+                                    <img class="w-full h-full object-cover" src="https://plus.unsplash.com/premium_photo-1664392147011-2a720f214e01?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8xfxxcHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D" alt="" />
+                                </div>
+                                <div>
+                                    <p class="font-medium text-sm md:text-base text-gray-800">Fresh Oranges</p>
+                                    <p class="text-xs text-gray-500">$11.75</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-span-2 md:col-span-2 text-center md:text-left font-bold text-black">$1.00</div>
-                        <div class="col-span-2 md:col-span-3 flex items-center justify-center space-x-1">
-                            <span class="font-bold">1</span>
-                        </div>
-                        <button class="col-span-2 md:col-span-2 text-center text-gray-800 bg-amber-600 text-white py-1 px-2 rounded-md hover:bg-amber-500">Click me</button>
-                    </div>
 
-                    <div class="grid grid-cols-12 items-center gap-4 py-4 border-b border-gray-200">
-                        <div class="col-span-1 flex justify-center">
-                            
+                        <div class="flex items-center justify-center space-x-2 quantity-controls">
+                            <span class="font-bold text-gray-800 min-w-[1.5rem] text-center">4</span>
                         </div>
-                        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
-                            <img src="https://placehold.jp/150x150.png"  class="w-14 h-14 rounded-lg object-cover shadow-sm">
-                            <div>
-                                <p class="font-medium text-black">T-Shirt</p>
+
+                        <button class="text-white cursor-pointer flex items-center gap-1.5 bg-amber-400 px-2.5 py-1 rounded-md">
+                            <span><i class='bx  bx-phone-forwarding'  ></i></span>
+                            <span class="text-md font-semibold hidden sm:block">contact</span>
+                        </button>
+
+                    </div>
+                    <div class="flex items-center justify-between gap-4 border-b border-gray-200 hover:bg-gray-50 transition-all duration-200 rounded-lg cart-row">
+                        <div class="flex items-center gap-1.5 md:gap-6">
+                            <button class=" transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+
+                            <div class="flex items-center gap-4">
+                                <div class="h-12 w-12 sm:h-16 sm:w-16 rounded-md overflow-hidden shadow-sm">
+                                    <img class="w-full h-full object-cover" src="https://plus.unsplash.com/premium_photo-1664392147011-2a720f214e01?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8xfxxcHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D" alt="" />
+                                </div>
+                                <div>
+                                    <p class="font-medium text-sm md:text-base text-gray-800">Fresh Oranges</p>
+                                    <p class="text-xs text-gray-500">$11.75</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-span-2 md:col-span-2 text-center md:text-left font-bold text-black">$1.00</div>
-                        <div class="col-span-2 md:col-span-3 flex items-center justify-center space-x-1">
-                            <span class="font-bold">1</span>
-                        </div>
-                        <button class="col-span-2 md:col-span-2 text-center text-gray-800 bg-amber-600 text-white py-1 px-2 rounded-md hover:bg-amber-500">Click me</button>
-                    </div>
 
-                    <div class="grid grid-cols-12 items-center gap-4 py-4">
-                        <div class="col-span-1 flex justify-center">
-         
+                        <div class="flex items-center justify-center space-x-2 quantity-controls">
+                            <span class="font-bold text-gray-800 min-w-[1.5rem] text-center">4</span>
                         </div>
-                        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
-                            <img src="https://placehold.jp/150x150.png"  class="w-14 h-14 rounded-lg object-cover shadow-sm">
-                            <div>
-                                <p class="font-medium text-black">T-Shirt</p>
-                            </div>
-                        </div>
-                        <div class="col-span-2 md:col-span-2 text-center md:text-left font-bold text-black">$1.00</div>
-                        <div class="col-span-2 md:col-span-3 flex items-center justify-center space-x-1">
-                            <span class="font-bold">1</span>
-                        </div>
-                        <button class="col-span-2 md:col-span-2 text-center text-gray-800 bg-amber-600 text-white py-1 px-2 rounded-md hover:bg-amber-500">Click me</button>
+
+                        <button class="text-white cursor-pointer flex items-center gap-1.5 bg-amber-400 px-2.5 py-1 rounded-md">
+                            <span><i class='bx  bx-phone-forwarding'  ></i></span>
+                            <span class="text-md font-semibold hidden sm:block">contact</span>
+                        </button>
+
                     </div>
 
                 </div>
 
-                <div class="lg:w-1/4 bg-white rounded-xl shadow-md p-6 h-fit">
-                    <h2 class="text-xl font-semibold text-black mb-4 pb-3 border-b border-gray-200">Order Summary</h2>
-                    <div class="space-y-3 text-gray-600">
-                        <div class="flex justify-between items-center">
-                            <span>Items</span>
-                            <span class="font-medium text-gray-800">1</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span>Sub Total</span>
-                            <span class="font-medium text-gray-800">$1.00</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span>Shipping</span>
-                            <span class="font-medium text-gray-800">$1.00</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span>Taxes</span>
-                            <span class="font-medium text-gray-800">$1.00</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span>Coupon Discount</span>
-                            <span class="font-medium text-red-500">-$1.00</span>
-                        </div>
-                        <div class="flex justify-between items-center pt-3 border-t border-gray-200 text-lg font-bold text-gray-900">
-                            <span>Total</span>
-                            <span>$1.00</span>
-                        </div>
+            </div>
+
+            <div class="max-w-full md:max-w-[400px] w-full px-8 pt-6 pb-10 rounded-xl drop-shadow-2xl border border-gray-300 h-fit">
+                <h2 class="text-xl font-semibold text-black mb-4 pb-3 border-b border-gray-200">Order Summary</h2>
+                <div class="space-y-3 text-gray-600">
+                    <div class="flex justify-between items-center">
+                        <span>Items</span>
+                        <span class="font-medium text-gray-800">1</span>
                     </div>
-                    <button class="mt-6 w-full bg-amber-600 text-white py-3 rounded-xl hover:bg-amber-500 transition duration-300  shadow-md">
-                        Proceed to Checkout
-                    </button>
+                    <div class="flex justify-between items-center">
+                        <span>Sub Total</span>
+                        <span class="font-medium text-gray-800">$1.00</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>Shipping</span>
+                        <span class="font-medium text-gray-800">$1.00</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>Taxes</span>
+                        <span class="font-medium text-gray-800">$1.00</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>Coupon Discount</span>
+                        <span class="font-medium text-red-500">-$1.00</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-3 border-t border-gray-200 text-lg font-bold text-gray-900">
+                        <span>Total</span>
+                        <span>$1.00</span>
+                    </div>
                 </div>
+                <button class="mt-6 w-full bg-amber-600 text-white py-3 rounded-full hover:bg-amber-500 transition duration-300  shadow-md">
+                    Proceed to Checkout
+                </button>
             </div>
         </div>
-    </div>
+
+    </main>
 
     <footer class="mt-4 bg-slate-800 text-white py-8 px-4">
     <div class="container mx-auto max-w-6xl">

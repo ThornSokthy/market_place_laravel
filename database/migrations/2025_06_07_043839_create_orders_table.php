@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreign('seller_id')->references('id')->on('users');
             $table->timestamp('order_date');
             $table->decimal('total_amount');
-            $table->bigInteger('address_id');
+            $table->bigInteger('address_id')->nullable();
             $table->timestamps();
         });
         Schema::enableForeignKeyConstraints();

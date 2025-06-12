@@ -16,9 +16,10 @@ class Order extends Model
     protected $fillable = [
         'buyer_id',
         'seller_id',
+        'order_date',
+        'total_amount',
         'address_id'
     ];
-
     public function buyer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'buyer_id');

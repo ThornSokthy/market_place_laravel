@@ -506,13 +506,11 @@
                                 <p class="my-1 line-clamp-2">{{ $product->title }}</p>
                                 <p class="text-sm text-gray-500">
                                     {{ $product->created_at->diffForHumans() }} by
-                                    <span class="text-cyan-500">{{ $product->seller->first_name }}</span>
+                                    <span class="text-cyan-500">{{ $product->seller->first_name }} {{ $product->seller->last_name }}</span>
                                 </p>
                                 <div class="flex justify-between items-end mt-4">
                                     <span>${{ number_format($product->price, 2) }}</span>
-                                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm">
-                                        View Detail
-                                    </button>
+                                    <p>{{ $product->quantity }} in stock</p>
                                 </div>
                             </div>
 

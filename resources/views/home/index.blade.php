@@ -2,6 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ env(".APP_NAME") }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
@@ -103,7 +104,7 @@
             </div>
             <span class="flex justify-between gap-4">
                 <span class="text-3xl"><i class='bx bx-heart'></i> </span>
-                <span class="text-3xl"><i class='bx bx-cart'></i> </span>
+                <a href="{{ route('order') }}" class="text-3xl"><i class='bx bx-cart'></i> </a>
             </span>
         </div>
     </header>
@@ -188,6 +189,7 @@
              currentSlide: 0,
              totalSlides: {{ $product->images->count() }},
              autoSlideInterval: null,
+             quantity: 1,
              init() {
                  if (this.totalSlides > 1) {
                      this.startAutoSlide();
@@ -210,7 +212,7 @@
              },
              prevSlide() {
                  this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
-             }
+             },
          }">
 
                         <div class="w-full aspect-square rounded-sm overflow-hidden mb-2 relative"
@@ -263,15 +265,54 @@
 
                         <div class="flex flex-col flex-grow px-1 pb-1">
                             <p class="my-1 line-clamp-2 font-medium">{{ $product->title }}</p>
+
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2 my-2">
+                                    <button @click="quantity > 1 ? quantity-- : null" class="px-2 bg-gray-200 rounded">
+                                        -
+                                    </button>
+                                    <span x-text="quantity" class="w-6 text-center"></span>
+                                    <button @click="quantity++" class="px-2 bg-gray-200 rounded">
+                                        +
+                                    </button>
+                                </div>
+                                <div>{{ $product->quantity }} in stock</div>
+                            </div>
+
                             <div class="flex justify-between items-end mt-auto pt-2">
                                 <span class="font-semibold">${{ number_format($product->price, 2) }}</span>
-                                <button class="text-xl py-1 cursor-pointer rounded-sm px-2 bg-slate-600 text-white hover:bg-slate-700 transition">
-                                    <i class='bx bx-cart-plus'></i>
-                                </button>
+
+                                <form action="{{ route('orders.store') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="seller_id" value="{{ $product->seller_id }}">
+                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                    <input type="hidden" name="price" value="{{ $product->price }}">
+                                    <input type="hidden" name="quantity" :value="quantity" max="{{ $product->quantity }}">
+
+                                    <button type="submit" class="text-xl py-1 cursor-pointer rounded-sm px-2 bg-slate-600 text-white hover:bg-slate-700 transition">
+                                        <i class='bx bx-cart-plus'></i>
+                                    </button>
+                                </form>
+
                             </div>
                         </div>
                     </div>
                 @endforeach
+
+                @if(session('success'))
+                    <div x-data="{ showSuccess: true }"
+                         x-init="setTimeout(() => showSuccess = false, 5000)"
+                         x-show="showSuccess"
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 transform translate-y-2"
+                         x-transition:enter-end="opacity-100 transform translate-y-0"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100 transform translate-y-0"
+                         x-transition:leave-end="opacity-0 transform translate-y-2"
+                         class="absolute left-0 bottom-0 bg-green-100 border-l-4 border-green-500 rounded-sm font-semibold text-green-700 px-4 py-3 mb-4">
+                        {{ session('success') }}
+                    </div>
+                @endif
 
             </div>
         </section>
