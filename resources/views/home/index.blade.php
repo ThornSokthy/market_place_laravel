@@ -12,7 +12,15 @@
     <header class="bg-slate-800 text-white px-8 py-4">
         <div class="mb-4 flex justify-between items-center">
             <div>
-                <a href="{{ route('home') }}" class="text-2xl">E-Market</a>
+                <a href="{{ route('home') }}" class="text-2xl font-bold">
+                    <span class="text-red-500">H</span>
+                    <span class="text-blue-500">a</span>
+                    <span class="text-green-500">P</span>
+                    <span class="text-yellow-500">p</span>
+                    <span class="text-purple-500">E</span>
+                    <span class="text-pink-500">n</span>
+                    <span class="text-indigo-500">O</span>
+                </a>
             </div>
             <nav class="gap-6 font-semibold hidden md:flex">
                 <a href="/" class="text-amber-600">HOME</a>
@@ -104,7 +112,7 @@
             </div>
             <span class="flex justify-between gap-4">
                 <span class="text-3xl"><i class='bx bx-heart'></i> </span>
-                <a href="{{ route('order') }}" class="text-3xl"><i class='bx bx-cart'></i> </a>
+                <a href="{{ route('orders') }}" class="text-3xl"><i class='bx  bx-shopping-bag-alt'  ></i>  </a>
             </span>
         </div>
     </header>

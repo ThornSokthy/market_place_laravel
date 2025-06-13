@@ -11,7 +11,15 @@
     <header class="bg-slate-800 text-white px-8 py-4">
     <div class=" flex justify-between items-center">
         <div>
-            <a href="{{ route('home') }}" class="text-2xl">E-Market</a>
+            <a href="{{ route('home') }}" class="text-2xl font-bold">
+                <span class="text-red-500">H</span>
+                <span class="text-blue-500">a</span>
+                <span class="text-green-500">P</span>
+                <span class="text-yellow-500">p</span>
+                <span class="text-purple-500">E</span>
+                <span class="text-pink-500">n</span>
+                <span class="text-indigo-500">O</span>
+            </a>
         </div>
         <nav class="gap-6 font-semibold hidden md:flex">
             <a href="/" class="text-amber-600">HOME</a>
@@ -112,93 +120,111 @@
 
                 <div class="mt-3 space-y-4">
 
-                    <div class="flex items-center justify-between gap-4 border-b border-gray-200 hover:bg-gray-50 transition-all duration-200 rounded-lg cart-row">
-                        <div class="flex items-center gap-1.5 md:gap-6">
-                            <button class=" transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
+                    @foreach($orders as $order)
 
-                            <div class="flex items-center gap-4">
-                                <div class="h-12 w-12 sm:h-16 sm:w-16 rounded-md overflow-hidden shadow-sm">
-                                    <img class="w-full h-full object-cover" src="https://plus.unsplash.com/premium_photo-1664392147011-2a720f214e01?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8xfxxcHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D" alt="" />
+                        @foreach($order->items as $item)
+                            <div class="flex items-center justify-between gap-4 border-b border-gray-200 hover:bg-gray-50 transition-all duration-200 rounded-lg cart-row mb-2">
+                                <div class="flex items-center gap-1.5 md:gap-6">
+
+                                    <form action="{{ route('orders.cancel', $order->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="transition-colors cursor-pointer">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </form>
+
+                                    <div class="flex items-center gap-4">
+                                        <div class="h-12 w-12 sm:h-16 sm:w-16 rounded-md overflow-hidden shadow-sm">
+                                            @php
+                                                $primaryImage = $item->product->images->where('is_primary', 1)->first();
+                                            @endphp
+                                            <img class="w-full h-full object-cover"
+                                                 src="{{ $primaryImage->image_url ?? ($item->product->images->first()->image_url ?? 'https://via.placeholder.com/100') }}"
+                                                 alt="{{ $item->product->title ?? 'Product' }}" />
+                                        </div>
+                                        <div>
+                                            {{ Str::limit($item->product->title ?? 'Unknown Product', 15) }}
+                                            <p class="text-xs text-gray-500">${{ number_format($item->price, 2) }}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="font-medium text-sm md:text-base text-gray-800">Fresh Oranges</p>
-                                    <p class="text-xs text-gray-500">$11.75</p>
+
+                                <div class="flex items-center justify-center space-x-2 quantity-controls">
+                                    <span class="font-bold text-gray-800 min-w-[1.5rem] text-center">{{ $item->quantity }}</span>
                                 </div>
+
+                                <div x-data="{ showDropdown: false }" class="relative">
+                                    <button
+                                        @click="showDropdown = !showDropdown"
+                                        @click.away="showDropdown = false"
+                                        class="text-white cursor-pointer flex items-center gap-1.5 bg-amber-400 hover:bg-amber-500 px-2.5 py-1 rounded-md transition-colors"
+                                    >
+                                        <span><i class='bx bx-phone-forwarding'></i></span>
+                                        <span class="text-md font-semibold hidden sm:block">Contact</span>
+                                    </button>
+
+                                    <div
+                                        x-show="showDropdown"
+                                        x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 scale-95"
+                                        x-transition:enter-end="opacity-100 scale-100"
+                                        x-transition:leave="transition ease-in duration-75"
+                                        x-transition:leave-start="opacity-100 scale-100"
+                                        x-transition:leave-end="opacity-0 scale-95"
+                                        class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
+                                    >
+                                        <div class="py-1">
+                                            <div class="px-4 py-2 rounded-tl-md rounded-tr-md text-sm text-gray-700 border-b bg-amber-300">
+                                                <p class="font-medium">Contact Seller</p>
+                                            </div>
+                                            <a
+                                                href="tel:{{ $order->seller->phone }}"
+                                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-100/90 "
+                                            >
+                                                <div class="flex items-center gap-2">
+                                                    <i class='bx bx-mobile-alt text-gray-500'></i>
+                                                    <span>{{ $order->seller->phone }}</span>
+                                                </div>
+                                            </a>
+                                            @if($order->seller->email)
+                                                <a
+                                                    href="mailto:{{ $order->seller->email }}"
+                                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-100/90"
+                                                >
+                                                    <div class="flex items-center gap-2">
+                                                        <i class='bx bx-envelope text-gray-500'></i>
+                                                        <span>{{ $order->seller->email }}</span>
+                                                    </div>
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
-                        </div>
+                        @endforeach
 
-                        <div class="flex items-center justify-center space-x-2 quantity-controls">
-                            <span class="font-bold text-gray-800 min-w-[1.5rem] text-center">4</span>
-                        </div>
+                    @endforeach
 
-                        <button class="text-white cursor-pointer flex items-center gap-1.5 bg-amber-400 px-2.5 py-1 rounded-md">
-                            <span><i class='bx  bx-phone-forwarding'  ></i></span>
-                            <span class="text-md font-semibold hidden sm:block">contact</span>
-                        </button>
+                        @if(session('cancel_success'))
+                            <div x-data="{ show: true }"
+                                 x-init="setTimeout(() => show = false, 5000)"
+                                 x-show="show"
+                                 x-transition:enter="transition ease-out duration-300"
+                                 x-transition:enter-start="opacity-0 transform translate-y-2"
+                                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                                 x-transition:leave="transition ease-in duration-300"
+                                 x-transition:leave-start="opacity-100 transform translate-y-0"
+                                 x-transition:leave-end="opacity-0 transform translate-y-2"
+                                 class="absolute left-0 bottom-0 bg-green-100 border-l-4 border-green-500 rounded-sm font-semibold text-green-700 px-4 py-3 mb-4">
 
-                    </div>
-                    <div class="flex items-center justify-between gap-4 border-b border-gray-200 hover:bg-gray-50 transition-all duration-200 rounded-lg cart-row">
-                        <div class="flex items-center gap-1.5 md:gap-6">
-                            <button class=" transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
+                                 {{ session('cancel_success') }}
 
-                            <div class="flex items-center gap-4">
-                                <div class="h-12 w-12 sm:h-16 sm:w-16 rounded-md overflow-hidden shadow-sm">
-                                    <img class="w-full h-full object-cover" src="https://plus.unsplash.com/premium_photo-1664392147011-2a720f214e01?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8xfxxcHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D" alt="" />
-                                </div>
-                                <div>
-                                    <p class="font-medium text-sm md:text-base text-gray-800">Fresh Oranges</p>
-                                    <p class="text-xs text-gray-500">$11.75</p>
-                                </div>
                             </div>
-                        </div>
-
-                        <div class="flex items-center justify-center space-x-2 quantity-controls">
-                            <span class="font-bold text-gray-800 min-w-[1.5rem] text-center">4</span>
-                        </div>
-
-                        <button class="text-white cursor-pointer flex items-center gap-1.5 bg-amber-400 px-2.5 py-1 rounded-md">
-                            <span><i class='bx  bx-phone-forwarding'  ></i></span>
-                            <span class="text-md font-semibold hidden sm:block">contact</span>
-                        </button>
-
-                    </div>
-                    <div class="flex items-center justify-between gap-4 border-b border-gray-200 hover:bg-gray-50 transition-all duration-200 rounded-lg cart-row">
-                        <div class="flex items-center gap-1.5 md:gap-6">
-                            <button class=" transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-
-                            <div class="flex items-center gap-4">
-                                <div class="h-12 w-12 sm:h-16 sm:w-16 rounded-md overflow-hidden shadow-sm">
-                                    <img class="w-full h-full object-cover" src="https://plus.unsplash.com/premium_photo-1664392147011-2a720f214e01?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8xfxxcHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D" alt="" />
-                                </div>
-                                <div>
-                                    <p class="font-medium text-sm md:text-base text-gray-800">Fresh Oranges</p>
-                                    <p class="text-xs text-gray-500">$11.75</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-center space-x-2 quantity-controls">
-                            <span class="font-bold text-gray-800 min-w-[1.5rem] text-center">4</span>
-                        </div>
-
-                        <button class="text-white cursor-pointer flex items-center gap-1.5 bg-amber-400 px-2.5 py-1 rounded-md">
-                            <span><i class='bx  bx-phone-forwarding'  ></i></span>
-                            <span class="text-md font-semibold hidden sm:block">contact</span>
-                        </button>
-
-                    </div>
+                        @endif
 
                 </div>
 

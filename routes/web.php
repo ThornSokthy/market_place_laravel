@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get("/", [ProductController::class, "index"])->name("home");
 Route::get("/profile", [UserController::class, "getProfile"])->name("profile");
-Route::get('/order', [UserController::class, 'getOrder'])->name("order");
 
+Route::get('/orders', [OrderController::class, 'index'])->name('orders');
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+Route::delete('/orders/{id}', [OrderController::class, 'cancel'])->name('orders.cancel');
 
 Route::post('/posts', [ProductController::class, 'store'])->name('posts.store');
 Route::delete('/posts/{id}', [ProductController::class, 'destroy'])->name('posts.destroy');

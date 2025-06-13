@@ -11,7 +11,15 @@
     <header class="bg-slate-800 text-white px-8 py-4">
     <div class=" flex justify-between items-center">
         <div>
-            <a href="{{ route('home') }}" class="text-2xl">E-Market</a>
+            <a href="{{ route('home') }}" class="text-2xl font-bold">
+                <span class="text-red-500">H</span>
+                <span class="text-blue-500">a</span>
+                <span class="text-green-500">P</span>
+                <span class="text-yellow-500">p</span>
+                <span class="text-purple-500">E</span>
+                <span class="text-pink-500">n</span>
+                <span class="text-indigo-500">O</span>
+            </a>
         </div>
         <nav class="gap-6 font-semibold hidden md:flex">
             <a href="/" class="text-amber-600">HOME</a>

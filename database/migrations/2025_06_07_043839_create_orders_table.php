@@ -21,6 +21,7 @@ return new class extends Migration
             $table->timestamp('order_date');
             $table->decimal('total_amount');
             $table->bigInteger('address_id')->nullable();
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
         });
         Schema::enableForeignKeyConstraints();

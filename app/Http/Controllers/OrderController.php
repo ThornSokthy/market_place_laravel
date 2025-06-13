@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderController extends Controller
 {
@@ -80,4 +81,44 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'An error occurred while processing your order: ' . $e->getMessage());
         }
     }
+
+    public function index()
+    {
+        $user = auth()->user();
+
+        $orders = Order::with(['buyer', 'seller', 'items.product.images'])
+            ->where(function ($query) use ($user) {
+                $query->where('buyer_id', $user->id)
+                    ->orWhere('seller_id', $user->id);
+            })->latest()->get();
+        return view('order.index', ['orders' => $orders]);
+    }
+
+    public function cancel($id)
+    {
+        $order = Order::whereNull('deleted_at')->findOrFail($id);
+
+        if ($order->buyer_id != auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+        DB::beginTransaction();
+        try {
+            foreach ($order->items as $item) {
+                $item->product()->increment('quantity', $item->quantity);
+            }
+
+            $order->delete();
+
+            DB::commit();
+
+            return redirect()->back()
+                ->with('cancel_success', 'Order has been canceled successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Failed to cancel order: '.$e->getMessage());
+        }
+
+    }
+
 }
