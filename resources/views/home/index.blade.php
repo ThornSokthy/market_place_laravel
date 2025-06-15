@@ -7,9 +7,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
 </head>
-<body>
+<body x-data="{ showSidebar: window.innerWidth >= 768 }" @resize.window="showSidebar = window.innerWidth >= 768">
 
-    <header class="bg-slate-800 text-white px-8 py-4">
+    <header class="bg-slate-800 text-white px-4 md:px-8 py-4">
         <div class="mb-4 flex justify-between items-center">
             <div>
                 <a href="{{ route('home') }}" class="text-2xl font-bold">
@@ -98,7 +98,11 @@
         </div>
         <div class="flex justify-between items-center">
             <div>
-                <button class="flex items-center gap-1 py-2 px-4 rounded-sm cursor-pointer bg-amber-600">
+                <button @click="window.innerWidth < 768 ? showSidebar = !showSidebar : null"
+                        @click.outside="showSidebar= false"
+                        class="flex items-center gap-1  py-2 px-4 rounded-sm cursor-pointer bg-amber-600 hover:bg-amber-700 transition-colors"
+                        aria-label="Toggle categories menu"
+                        :aria-expanded="showSidebar">
                     <span class="text-xl"><i class='bx bx-menu-wide'></i></span>
                     <span class="hidden text-[12px] font-semibold md:block">ALL CATEGORIES</span>
                     <span class="text-2xl ml-4 hidden md:block"><i class='bx bx-chevron-down'  ></i> </span>
@@ -106,7 +110,7 @@
             </div>
             <div class="w-2/3 flex justify-center">
                 <input class="w-2/3 bg-white text-black focus:outline-0 py-2 pl-3 rounded-tl-sm rounded-bl-sm" type="text" placeholder="Search...."/>
-                <button class="bg-amber-600 text-xl px-6 py-2.5 rounded-tr-sm rounded-br-sm">
+                <button class="bg-amber-600 text-xl px-4 md:px-6 py-2.5 rounded-tr-sm rounded-br-sm">
                     <i class='bx bx-search'></i>
                 </button>
             </div>
@@ -118,63 +122,86 @@
     </header>
 
     <main class="w-full px-6 grid grid-cols-12 gap-4">
-        <aside class="col-span-3 h-full hidden md:block">
-            <div class="cat-section">
-                <div>
-                    <i class='bx bx-gift'  ></i>
-                    <span>Gifts & Toys</span>
+        <aside
+            x-show="showSidebar"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 -translate-x-full md:translate-x-0"
+            x-transition:enter-end="opacity-100 translate-x-0"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 translate-x-0"
+            x-transition:leave-end="opacity-0 -translate-x-full md:translate-x-0"
+            class="fixed md:static inset-y-0 left-0 z-40 w-64 md:w-full bg-white shadow-lg md:shadow-none md:col-span-3 h-full overflow-y-auto"
+        >
+            <div class="p-4 space-y-6">
+                <div class="block md:hidden">
+                    <a href="{{ route('home') }}" class="text-2xl font-bold">
+                        <span class="text-red-500">H</span>
+                        <span class="text-blue-500">a</span>
+                        <span class="text-green-500">P</span>
+                        <span class="text-yellow-500">p</span>
+                        <span class="text-purple-500">E</span>
+                        <span class="text-pink-500">n</span>
+                        <span class="text-indigo-500">O</span>
+                    </a>
                 </div>
-                <div>
-                    <i class='bx bx-ev-station'  ></i>
-                    <span>Electronics</span>
+                <div class="cat-section space-y-2">
+                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
+                        <i class='bx bx-gift text-lg'></i>
+                        <span>Gifts & Toys</span>
+                    </div>
+                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
+                        <i class='bx bx-ev-station text-lg'></i>
+                        <span>Electronics</span>
+                    </div>
+                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
+                        <i class='bx bx-dress text-lg'></i>
+                        <span>Fashion & Accessories</span>
+                    </div>
+                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
+                        <i class='bx bx-sneaker text-lg'></i>
+                        <span>Bags & Shoes</span>
+                    </div>
+                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
+                        <i class='bx bx-bath text-lg'></i>
+                        <span>Bathroom</span>
+                    </div>
+                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
+                        <i class='bx bx-heart-plus text-lg'></i>
+                        <span>Health & Beauty</span>
+                    </div>
+                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
+                        <i class='bx bx-garage text-lg'></i>
+                        <span>Home & Light</span>
+                    </div>
+                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
+                        <i class='bx bx-bed text-lg'></i>
+                        <span>Bedroom</span>
+                    </div>
                 </div>
-                <div>
-                    <i class='bx bx-dress'  ></i>
-                    <span>Fashion & Accessories</span>
-                </div>
-                <div>
-                    <i class='bx bx-sneaker'  ></i>
-                    <span>Begs & Shoes</span>
-                </div>
-                <div>
-                    <i class='bx bx-bath'  ></i>
-                    <span>Bathroom</span>
-                </div>
-                <div>
-                    <i class='bx bx-heart-plus'  ></i>
-                    <span>Health & Beauty</span>
-                </div>
-                <div>
-                    <i class='bx bx-garage'  ></i>
-                    <span>Home & Light</span>
-                </div>
-                <div>
-                    <i class='bx bx-bed'  ></i>
-                    <span>Bedroom</span>
-                </div>
-            </div>
-            <div>
-                <h2 class="mb-4 font-bold">LATEST PRODUCTS</h2>
-                <div class="latest-product">
 
-                    @foreach($latestProducts as $latest)
-                        <div>
-                            <div class="img">
-                                <img src="{{ $latest->images->first()->image_url }}" alt="{{ $latest->title }}" />
+                <div>
+                    <h2 class="mb-4 font-bold text-lg">LATEST PRODUCTS</h2>
+                    <div class="latest-product space-y-4">
+                        @foreach($latestProducts as $latest)
+                            <div class="flex gap-3 items-center p-2 hover:bg-gray-50 rounded">
+                                <div class="img">
+                                    <img
+                                        src="{{ $latest->images->first()->image_url }}"
+                                        alt="{{ $latest->title }}"
+                                    />
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium truncate">{{ $latest->title }}</p>
+                                    <span class="text-amber-500 font-semibold">${{ number_format($latest->price, 2) }}</span>
+                                </div>
                             </div>
-                            <div>
-                                <p>Adidas shoes</p>
-                                <span class="text-amber-500">${{ number_format($latest->price, 2) }}</span>
-                            </div>
-                        </div>
-                    @endforeach
-
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </aside>
 
         <section class="col-span-full md:col-span-9 h-full mt-3">
-
             <div class="flex justify-between items-center">
                 <div class="bg-slate-700 text-white py-2 px-4">
                     TRENDING ITEMS
@@ -274,7 +301,7 @@
                         <div class="flex flex-col flex-grow px-1 pb-1">
                             <p class="my-1 line-clamp-2 font-medium">{{ $product->title }}</p>
 
-                            <div class="flex justify-between items-center">
+                            <div class="flex flex-col md:flex-row justify-between items-start gap-1 sm:items-center">
                                 <div class="flex items-center gap-2 my-2">
                                     <button @click="quantity > 1 ? quantity-- : null" class="px-2 bg-gray-200 rounded">
                                         -

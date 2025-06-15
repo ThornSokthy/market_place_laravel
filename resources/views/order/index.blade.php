@@ -112,7 +112,7 @@
                 <div class="bg-amber-400 py-2 rounded-md mt-6 px-2 flex items-center justify-between text-sm font-semibold text-gray-600 uppercase">
                     <div class="flex items-center gap-6">
                         <span class="w-6 md:w-12"></span>
-                        <span class="min-w-[8rem]">Product</span>
+                        <span class="min-w-[8rem] md:min-w-[10rem]">Product</span>
                     </div>
                     <div class="text-center min-w-[4rem]">Qty</div>
                     <div class="min-w-[6rem] text-center">Action</div>
@@ -124,7 +124,7 @@
 
                         @foreach($order->items as $item)
                             <div class="flex items-center justify-between gap-4 border-b border-gray-200 hover:bg-gray-50 transition-all duration-200 rounded-lg cart-row mb-2">
-                                <div class="flex items-center gap-1.5 md:gap-6">
+                                <div class="w-1/3 flex items-center gap-1.5 md:gap-6">
 
                                     <form action="{{ route('orders.cancel', $order->id) }}" method="POST">
                                         @csrf
@@ -146,7 +146,7 @@
                                                  alt="{{ $item->product->title ?? 'Product' }}" />
                                         </div>
                                         <div>
-                                            {{ Str::limit($item->product->title ?? 'Unknown Product', 15) }}
+                                            {{ Str::limit($item->product->title ?? 'Unknown Product', 12) }}
                                             <p class="text-xs text-gray-500">${{ number_format($item->price, 2) }}</p>
                                         </div>
                                     </div>
@@ -209,7 +209,7 @@
 
                     @endforeach
 
-                        @if(session('cancel_success'))
+                    @if(session('cancel_success'))
                             <div x-data="{ show: true }"
                                  x-init="setTimeout(() => show = false, 5000)"
                                  x-show="show"

@@ -30,6 +30,7 @@ class ProductController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric',
+            'quantity' => 'required|numeric',
             'category' => 'required|string',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120' // 5MB max
         ]);
@@ -38,6 +39,7 @@ class ProductController extends Controller
             'seller_id' => Auth::id(),
             'title' => $validated['title'],
             'price' => $validated['price'],
+            'quantity' => $validated['quantity'],
             'description' => $validated['description'],
             'category' => $validated['category'],
             'status' => 'available',
