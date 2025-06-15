@@ -7,7 +7,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
 </head>
-<body x-data="{ showSidebar: window.innerWidth >= 768 }" @resize.window="showSidebar = window.innerWidth >= 768">
+<body x-data="{
+    showSidebar: window.innerWidth >= 768,
+    init() {
+        this.$watch('showSidebar', val => {
+            if (window.innerWidth >= 768) this.showSidebar = true;
+        });
+    }
+ }">
 
     <header class="bg-slate-800 text-white px-4 md:px-8 py-4">
         <div class="mb-4 flex justify-between items-center">
@@ -202,21 +209,52 @@
         </aside>
 
         <section class="col-span-full md:col-span-9 h-full mt-3">
-            <div class="flex justify-between items-center">
+            <div x-data="{ showTrendingDropdown: false }" class="flex justify-between items-center relative">
                 <div class="bg-slate-700 text-white py-2 px-4">
                     TRENDING ITEMS
                 </div>
-                <span class="text-2xl block md:hidden"><i class='bx bx-dots-vertical-rounded'  ></i> </span>
+
+                <div class="relative">
+                    <button
+                        @click.stop="showTrendingDropdown = !showTrendingDropdown"
+                        class="text-2xl block md:hidden focus:outline-none cursor-pointer"
+                        aria-label="Toggle trending items menu"
+                    >
+                        <i class='bx bx-dots-vertical-rounded'></i>
+                    </button>
+
+                    <div
+                        x-show="showTrendingDropdown"
+                        @click.away="showTrendingDropdown = false"
+                        x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-75"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="absolute right-0 mt-1 w-40 bg-white rounded-md shadow-lg z-50 md:hidden shadow-2xl"
+                        style="display: none;"
+                    >
+                        <div class="py-1">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-100/90 hover:text-amber-600">ALL</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-100/90 hover:text-amber-600">Bathroom</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-100/90 hover:text-amber-600">Electronic</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-100/90 hover:text-amber-600">Bedroom</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-100/90 hover:text-amber-600">Health & Beauty</a>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="hidden md:flex gap-4">
-                    <a class="text-amber-600 font-semibold border-b-[3px] pb-1">ALL</a>
-                    <a class="font-medium text-gray-400">Bathroom</a>
-                    <a class="font-medium text-gray-400">Electronic</a>
-                    <a class="font-medium text-gray-400">Bedroom</a>
-                    <a class="font-medium text-gray-400">Health & Beauty</a>
+                    <a class="text-amber-600 font-semibold border-b-[3px] pb-1 border-amber-600">ALL</a>
+                    <a class="font-medium text-gray-400 hover:text-amber-600 transition-colors">Bathroom</a>
+                    <a class="font-medium text-gray-400 hover:text-amber-600 transition-colors">Electronic</a>
+                    <a class="font-medium text-gray-400 hover:text-amber-600 transition-colors">Bedroom</a>
+                    <a class="font-medium text-gray-400 hover:text-amber-600 transition-colors">Health & Beauty</a>
                 </div>
             </div>
 
-            <div class="my-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            <div class="my-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
 
                 @foreach($products as $product)
                     <div class="flex flex-col shadow-lg p-2 h-full relative"
@@ -301,7 +339,7 @@
                         <div class="flex flex-col flex-grow px-1 pb-1">
                             <p class="my-1 line-clamp-2 font-medium">{{ $product->title }}</p>
 
-                            <div class="flex flex-col md:flex-row justify-between items-start gap-1 sm:items-center">
+                            <div class="flex flex-col md:flex-row justify-between items-start gap-1 md:items-center">
                                 <div class="flex items-center gap-2 my-2">
                                     <button @click="quantity > 1 ? quantity-- : null" class="px-2 bg-gray-200 rounded">
                                         -
@@ -344,12 +382,16 @@
                          x-transition:leave="transition ease-in duration-300"
                          x-transition:leave-start="opacity-100 transform translate-y-0"
                          x-transition:leave-end="opacity-0 transform translate-y-2"
-                         class="absolute left-0 bottom-0 bg-green-100 border-l-4 border-green-500 rounded-sm font-semibold text-green-700 px-4 py-3 mb-4">
+                         class="absolute right-0 bottom-0 bg-green-100 border-l-4 border-green-500 rounded-sm font-semibold text-green-700 px-4 py-3 mb-4">
                         {{ session('success') }}
                     </div>
                 @endif
 
             </div>
+            <div>
+                {{ $products->links('vendor.pagination.custom') }}
+            </div>
+
         </section>
     </main>
 
