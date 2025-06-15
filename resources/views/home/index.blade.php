@@ -151,39 +151,25 @@
                         <span class="text-indigo-500">O</span>
                     </a>
                 </div>
+
                 <div class="cat-section space-y-2">
-                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
-                        <i class='bx bx-gift text-lg'></i>
-                        <span>Gifts & Toys</span>
-                    </div>
-                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
-                        <i class='bx bx-ev-station text-lg'></i>
-                        <span>Electronics</span>
-                    </div>
-                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
-                        <i class='bx bx-dress text-lg'></i>
-                        <span>Fashion & Accessories</span>
-                    </div>
-                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
-                        <i class='bx bx-sneaker text-lg'></i>
-                        <span>Bags & Shoes</span>
-                    </div>
-                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
-                        <i class='bx bx-bath text-lg'></i>
-                        <span>Bathroom</span>
-                    </div>
-                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
-                        <i class='bx bx-heart-plus text-lg'></i>
-                        <span>Health & Beauty</span>
-                    </div>
-                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
-                        <i class='bx bx-garage text-lg'></i>
-                        <span>Home & Light</span>
-                    </div>
-                    <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
-                        <i class='bx bx-bed text-lg'></i>
-                        <span>Bedroom</span>
-                    </div>
+
+                    <a href="{{ url()->current() }}"
+                       class="flex items-center gap-2 p-2 rounded cursor-pointer transition-colors {{ !$selectedCategory ? 'bg-amber-100/90 font-medium' : 'hover:bg-amber-200' }}">
+                        <i class='bx  bx-categories text-lg'  ></i>
+                        <span>All Categories</span>
+                    </a>
+
+                    @foreach($categories as $categoryName => $iconClass)
+                        <a href="{{ request()->fullUrlWithQuery(['category' => $categoryName]) }}"
+                           class="flex items-center gap-2 p-2 rounded cursor-pointer transition-colors {{ $selectedCategory == $categoryName ? 'bg-amber-100/90 font-medium' : 'hover:bg-amber-200' }}">
+                            <i class='bx {{ $iconClass }} text-lg'></i>
+                            <span>{{ $categoryName == 'electronics' ? 'Electronics' : $categoryName }}</span>
+                            @isset($categoryCounts)
+                                <span class="text-xs text-gray-500 ml-auto">({{ $categoryCounts[$categoryName] ?? 0 }})</span>
+                            @endisset
+                        </a>
+                    @endforeach
                 </div>
 
                 <div>

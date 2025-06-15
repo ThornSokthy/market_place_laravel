@@ -10,9 +10,28 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('images')->where('is_active', 1)->paginate(15);
+        $categories = [
+            'Gifts & Toys' => 'bx-gift',
+            'electronics' => 'bx-ev-station',
+            'Fashion & Accessories' => 'bx-dress',
+            'Bags & Shoes' => 'bx-sneaker',
+            'Bathroom' => 'bx-bath',
+            'Health & Beauty' => 'bx-heart-plus',
+            'Home & Light' => 'bx-garage',
+            'Bedroom' => 'bx-bed'
+        ];
+        // Start with base query
+        $query = Product::with('images')->where('is_active', 1);
+
+        // Apply category filter if selected
+        if ($request->has('category') && array_key_exists($request->category, $categories)) {
+            $query->where('category', $request->category);
+        }
+
+        // Paginate the results
+        $products = $query->paginate(15);
         $latestProducts = Product::with('images')
             ->where('is_active', 1)
             ->latest()
@@ -20,7 +39,9 @@ class ProductController extends Controller
             ->get();
         return view('home.index', [
             'products' => $products,
-            'latestProducts' => $latestProducts
+            'latestProducts' => $latestProducts,
+            'categories' => $categories,
+            'selectedCategory' => $request->category ?? null
         ]);
     }
 
