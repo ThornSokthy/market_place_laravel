@@ -22,15 +22,20 @@ class ProductController extends Controller
             'Home & Light' => 'bx-garage',
             'Bedroom' => 'bx-bed'
         ];
-        // Start with base query
-        $query = Product::with('images')->where('is_active', 1);
+        $query = Product::with('images')
+            ->where('is_active', 1)
+            ->where('quantity', '>', 0);
 
-        // Apply category filter if selected
         if ($request->has('category') && array_key_exists($request->category, $categories)) {
             $query->where('category', $request->category);
         }
-
-        // Paginate the results
+        if ($request->has('search')) {
+            $productName = $request->search;
+            $query->where(function($q) use ($productName) {
+                $q->where('title', 'LIKE', "%{$productName}%");
+//                    ->orWhere('description', 'LIKE', "%{$productName}%");
+            });
+        }
         $products = $query->paginate(15);
         $latestProducts = Product::with('images')
             ->where('is_active', 1)

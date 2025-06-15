@@ -115,12 +115,47 @@
                     <span class="text-2xl ml-4 hidden md:block"><i class='bx bx-chevron-down'  ></i> </span>
                 </button>
             </div>
-            <div class="w-2/3 flex justify-center">
-                <input class="w-2/3 bg-white text-black focus:outline-0 py-2 pl-3 rounded-tl-sm rounded-bl-sm" type="text" placeholder="Search...."/>
-                <button class="bg-amber-600 text-xl px-4 md:px-6 py-2.5 rounded-tr-sm rounded-br-sm">
-                    <i class='bx bx-search'></i>
-                </button>
+
+            <div class="w-2/3 px-2 flex justify-center"
+                 x-data="{
+                     search: '{{ request('search') ?? '' }}',
+                     isLoading: false,
+                     performSearch() {
+                         this.isLoading = true;
+                         const params = new URLSearchParams(window.location.search);
+
+                         if (this.search) {
+                             params.set('search', this.search);
+                         } else {
+                             params.delete('search');
+                         }
+                         window.location = '{{ url()->current() }}?' + params.toString();
+                     }
+                 }"
+                 x-init="if(search) $nextTick(() => $refs.searchInput.focus())">
+                <div class="w-full relative">
+                    <input
+                        x-ref="searchInput"
+                        x-model="search"
+                        @keyup.enter="performSearch()"
+                        class="w-full bg-white text-black focus:outline-0 py-2 pl-3 pr-10 rounded-sm border border-gray-300 focus:border-amber-500 transition-colors"
+                        type="text"
+                        placeholder="Search products..."
+                        aria-label="Search products"
+                    />
+                    <button @click="performSearch()"
+                         aria-label="Perform search"
+                         class="bg-amber-500 rounded-tr-sm rounded-br-sm absolute right-0 top-0 h-full flex items-center px-4 cursor-pointer">
+                        <i x-show="!isLoading" class='bx bx-search text-xl'></i>
+                        <svg x-show="isLoading" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+
+                </div>
             </div>
+
             <span class="flex justify-between gap-4">
                 <span class="text-3xl"><i class='bx bx-heart'></i> </span>
                 <a href="{{ route('orders') }}" class="text-3xl"><i class='bx  bx-shopping-bag-alt'  ></i>  </a>
