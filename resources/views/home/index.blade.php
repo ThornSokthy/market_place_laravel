@@ -54,7 +54,10 @@
                         >
                             <img
                                 class="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
-                                src="{{ Auth::user()->profile_photo_url ?? 'https://www.gravatar.com/avatar/' . md5(strtolower(trim(Auth::user()->email))) }}"
+                                src="{{ Auth::user()->profile_picture
+                                    ? Auth::user()->profile_picture
+                                    : 'https://randomuser.me/api/portraits/men/1.jpg'
+                                }}"
                                 alt="Profile picture"
                             />
                         </div>

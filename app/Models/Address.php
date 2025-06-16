@@ -19,6 +19,7 @@ class Address extends Model
         'district',
         'city',
         'postal_code',
+        'is_default',
     ];
 
     public function user(): BelongsTo {

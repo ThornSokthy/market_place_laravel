@@ -46,7 +46,10 @@
                     >
                         <img
                             class="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
-                            src="{{ Auth::user()->profile_photo_url ?? 'https://www.gravatar.com/avatar/' . md5(strtolower(trim(Auth::user()->email))) }}"
+                            src="{{ Auth::user()->profile_picture
+                                ? Auth::user()->profile_picture
+                                : 'https://randomuser.me/api/portraits/men/1.jpg'
+                            }}"
                             alt="Profile picture"
                         />
                     </div>
@@ -173,7 +176,10 @@
         <div class="px-4 sm:px-16 md:px-20 lg:px-28 pb-4 relative border-b-1 border-double border-gray-400">
 
             <div class="absolute -top-12 left-2 sm:left-10 md:left-16 lg:left-24 border-4 border-white rounded-full overflow-hidden">
-                <img src="https://randomuser.me/api/portraits/men/1.jpg"
+                <img src="{{ Auth::user()->profile_picture
+                        ? Auth::user()->profile_picture
+                        : 'https://randomuser.me/api/portraits/men/1.jpg'
+                    }}"
                      alt="Profile"
                      class="w-24 h-24 object-cover">
             </div>
@@ -187,12 +193,23 @@
 
                 <div class="flex justify-between md:justify-end items-center w-full gap-6 mt-4 border-gray-100 pt-3">
 
-                    <button
-                        class="bg-amber-500 px-5 py-2 rounded-md text-sm font-medium cursor-pointer text-white hover:bg-amber-600 transition-colors"
-                        @click="initForm(); showModal = true"
-                    >
-                        Add Post
-                    </button>
+                    <div >
+                        <button
+                            class="bg-amber-500 px-2 md:px-5 py-2 rounded-md text-sm font-medium cursor-pointer text-white hover:bg-amber-600 transition-colors"
+                            @click="initForm(); showModal = true"
+                        >
+                            <span class="block md:hidden text-2xl"><i class='bx  bx-image-plus'  ></i></span>
+                            <span class="hidden md:block">Add Post</span>
+                        </button>
+                        <button
+                            class="bg-amber-500 px-2 md:px-5 py-2 rounded-md text-sm font-medium cursor-pointer text-white hover:bg-amber-600 transition-colors"
+                        >
+                            <a href="{{ route('profile.edit') }}">
+                                <span class="block md:hidden text-2xl"><i class='bx  bx-edit'  ></i></span>
+                                <span class="hidden md:block">Update Profile</span>
+                            </a>
+                        </button>
+                    </div>
 
                     <div
                         x-show="showModal"

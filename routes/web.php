@@ -7,7 +7,6 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get("/", [ProductController::class, "index"])->name("home");
-Route::get("/profile", [UserController::class, "getProfile"])->name("profile");
 
 Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
@@ -17,6 +16,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/posts', [ProductController::class, 'store'])->name('posts.store');
     Route::delete('/posts/{id}', [ProductController::class, 'destroy'])->name('posts.destroy');
     Route::put('/posts/{id}', [ProductController::class, 'update'])->name('posts.update');
+
+    Route::get("/profile", [UserController::class, "getProfile"])->name("profile");
+    Route::get("/profile/update", [UserController::class, "edit"])->name("profile.edit");
+    Route::put("/profile/update", [UserController::class, "update"])->name("profile.update");
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
